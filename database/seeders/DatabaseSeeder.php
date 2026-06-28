@@ -33,6 +33,7 @@ class DatabaseSeeder extends Seeder
             BookSeeder::class,
             OrderSeeder::class, // <-- PASTIKAN INI ADA
             NotificationSeeder::class,
+            ChatSeeder::class, // <-- BARU: agar fitur chat punya data
         ]);
     }
 }

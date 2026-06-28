@@ -21,11 +21,15 @@ class ChatController extends Controller
         $userId = Auth::id();
         $tab = $request->query('tab', 'penjual');
 
-        // Query untuk mendapatkan list chat terakhir per user
-        $subquery = Message::select(DB::raw('LEAST(sender_id, receiver_id) as user_1, GREATEST(sender_id, receiver_id) as user_2, MAX(id) as last_msg_id'))
+        // Satu baris per percakapan (pasangan user), membawa id pesan pertama & terakhir.
+        // CASE dipakai (bukan LEAST/GREATEST) agar portabel: jalan di MySQL maupun SQLite.
+        $low  = 'CASE WHEN sender_id < receiver_id THEN sender_id ELSE receiver_id END';
+        $high = 'CASE WHEN sender_id < receiver_id THEN receiver_id ELSE sender_id END';
+
+        $subquery = Message::select(DB::raw("($low) as user_1, ($high) as user_2, MAX(id) as last_msg_id, MIN(id) as first_msg_id"))
             ->where('sender_id', $userId)
             ->orWhere('receiver_id', $userId)
-            ->groupBy(DB::raw('LEAST(sender_id, receiver_id), GREATEST(sender_id, receiver_id)'));
+            ->groupBy(DB::raw("($low), ($high)"));
 
         $threads = DB::table(DB::raw("({$subquery->toSql()}) as threads"))
             ->mergeBindings($subquery->getQuery())
@@ -33,50 +37,49 @@ class ChatController extends Controller
             ->orderBy('messages.created_at', 'desc')
             ->get();
 
+        // --- Batch-load semua relasi sekali jalan (menghindari N+1 di dalam loop) ---
+        $partnerIds = $threads
+            ->map(fn ($t) => $t->user_1 == $userId ? $t->user_2 : $t->user_1)
+            ->unique()->values();
+
+        $partners = User::whereIn('id', $partnerIds)->get()->keyBy('id');
+
+        // Pengirim pesan PERTAMA tiap thread -> menentukan inisiator.
+        $firstSenders = Message::whereIn('id', $threads->pluck('first_msg_id'))
+            ->pluck('sender_id', 'id');
+
+        // Jumlah pesan belum dibaca per partner (1 query, dikelompokkan).
+        $unreadByPartner = Message::where('receiver_id', $userId)
+            ->where('is_read', false)
+            ->whereIn('sender_id', $partnerIds)
+            ->select('sender_id', DB::raw('COUNT(*) as c'))
+            ->groupBy('sender_id')
+            ->pluck('c', 'sender_id');
+
         $chats = [];
 
         foreach ($threads as $thread) {
             $partnerId = ($thread->user_1 == $userId) ? $thread->user_2 : $thread->user_1;
-            $partner = User::find($partnerId);
+            $partner = $partners->get($partnerId);
 
             if (!$partner) continue;
 
-            // Logika Tab Penjual vs Pembeli (DIPERBAIKI)
-            // Cek pesan pertama di thread ini untuk menentukan inisiator
-            $firstMsg = Message::where(function($q) use ($userId, $partnerId) {
-                $q->where('sender_id', $userId)->where('receiver_id', $partnerId);
-            })->orWhere(function($q) use ($userId, $partnerId) {
-                $q->where('sender_id', $partnerId)->where('receiver_id', $userId);
-            })->oldest()->first();
-
-            // Definisi Inisiator: Orang yang mengirim pesan PERTAMA kali.
-            $isInitiator = ($firstMsg && $firstMsg->sender_id == $userId);
-
-            // LOGIKA BARU:
-            // Jika saya Inisiator (saya chat duluan) -> Saya bertindak sebagai PEMBELI -> Lawan bicara adalah PENJUAL.
-            // Jadi chat ini harus masuk ke tab "Penjual" (Daftar Penjual yang saya hubungi).
-
-            // Jika saya BUKAN Inisiator (orang lain chat saya) -> Saya bertindak sebagai PENJUAL -> Lawan bicara adalah PEMBELI.
-            // Jadi chat ini harus masuk ke tab "Pembeli" (Daftar Pembeli yang menghubungi saya).
+            // Inisiator = pengirim pesan pertama di thread.
+            // Saya inisiator      -> saya PEMBELI, lawan PENJUAL  -> tab "penjual".
+            // Saya bukan inisiator -> saya PENJUAL, lawan PEMBELI -> tab "pembeli".
+            $isInitiator = ($firstSenders->get($thread->first_msg_id) == $userId);
 
             if ($tab == 'penjual') {
-                // Tampilkan orang-orang yang SAYA hubungi (karena mereka penjualnya)
                 if (!$isInitiator) continue;
             } elseif ($tab == 'pembeli') {
-                // Tampilkan orang-orang yang menghubungi SAYA (karena mereka pembelinya)
                 if ($isInitiator) continue;
             }
-
-            $unreadCount = Message::where('sender_id', $partnerId)
-                ->where('receiver_id', $userId)
-                ->where('is_read', false)
-                ->count();
 
             $chats[] = (object) [
                 'user' => $partner,
                 'last_message' => $thread->message ?? 'Sent a photo',
                 'time' => \Carbon\Carbon::parse($thread->created_at),
-                'unread' => $unreadCount
+                'unread' => $unreadByPartner->get($partnerId, 0),
             ];
         }
 

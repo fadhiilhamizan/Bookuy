@@ -68,8 +68,10 @@
             </div>
         </div>
 
-        <!-- Bagian Konten Putih -->
-        <div class="px-6 pt-8 space-y-8">
+        <!-- Bagian Konten Putih (desktop: 2 kolom via container query) -->
+        <div class="@container px-6 pt-8 pb-8">
+            <div class="grid grid-cols-1 @3xl:grid-cols-2 gap-8 @3xl:gap-x-10 items-start">
+            <div class="space-y-8">
             <!-- Deskripsi -->
             <div>
                 <h3 class="font-bold text-gray-900 text-lg mb-2">Deskripsi Produk</h3>
@@ -116,7 +118,9 @@
                     @endif
                 </div>
             </div>
+            </div>{{-- left column --}}
 
+            <div class="space-y-8">{{-- right column --}}
             <!-- Rating -->
             <div>
                 <div class="flex items-end gap-2 mb-4">
@@ -193,8 +197,9 @@
                     </div>
                 </form>
             </div>
+            </div>{{-- right column --}}
+            </div>{{-- grid --}}
         </div>
-    </div>
 
     <!-- 3. Sticky Bottom Bar -->
     <div class="absolute bottom-0 left-0 w-full h-[100px] bg-blue-600 rounded-t-[30px] shadow-[0_-5px_20px_rgba(0,0,0,0.1)] z-50 px-6 flex items-center justify-between">
