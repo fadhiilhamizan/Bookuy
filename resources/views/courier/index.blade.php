@@ -55,8 +55,8 @@
             <div class="flex gap-4 mt-2">
                 <!-- Book Image -->
                 <div class="w-20 h-28 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden shadow-inner">
-                    <img src="{{ $order->book->gambar_buku[0] ?? asset('images/illustration-no-books.png') }}"
-                         class="w-full h-full object-cover" alt="Book">
+                    <img src="{{ $order->book->cover_url }}"
+                         class="w-full h-full object-cover" alt="Book" onerror="this.src='{{ asset('images/illustration-no-books.png') }}'">
                 </div>
 
                 <!-- Details -->

@@ -37,17 +37,7 @@
                     <!-- 1. Gambar Lama (Existing) -->
                     @foreach($book->gambar_buku as $img)
                     <div class="relative rounded-lg overflow-hidden aspect-[2/3] group image-slot existing-image">
-                        <!-- PERBAIKAN LOGIKA GAMBAR -->
-                        @php
-                            $imgSrc = asset('images/illustration-no-books.png');
-                            if (Illuminate\Support\Str::startsWith($img, 'http')) {
-                                $imgSrc = $img;
-                            } else {
-                                $filename = basename($img);
-                                $imgSrc = asset('books/' . $filename);
-                            }
-                        @endphp
-                        <img src="{{ $imgSrc }}" class="w-full h-full object-cover" onerror="this.src='{{ asset('images/illustration-no-books.png') }}'">
+                        <img src="{{ $book->resolveImageUrl($img) }}" class="w-full h-full object-cover" onerror="this.src='{{ asset('images/illustration-no-books.png') }}'">
 
                         <!-- Input Hidden untuk menjaga gambar ini saat save -->
                         <input type="hidden" name="keep_images[]" value="{{ $img }}">

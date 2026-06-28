@@ -63,23 +63,7 @@
                     <div class="flex gap-4">
                         <!-- Foto Buku -->
                         <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
-                            @php
-                                $imgSrc = asset('images/illustration-no-books.png');
-                                if ($order->book) {
-                                    // Ambil gambar pertama jika array, atau string langsung
-                                    $img = is_array($order->book->gambar_buku) ? ($order->book->gambar_buku[0] ?? '') : $order->book->gambar_buku;
-
-                                    // Cek apakah URL eksternal atau path lokal
-                                    if (Illuminate\Support\Str::startsWith($img, 'http')) {
-                                        $imgSrc = $img;
-                                    } elseif (!empty($img)) {
-                                        // REVISI: Mengambil file dari folder 'public/books' menggunakan basename
-                                        $filename = basename($img);
-                                        $imgSrc = asset('books/' . $filename);
-                                    }
-                                }
-                            @endphp
-                            <img src="{{ $imgSrc }}" class="w-full h-full object-cover" onerror="this.src='{{ asset('images/illustration-no-books.png') }}'">
+                            <img src="{{ $order->book->cover_url }}" class="w-full h-full object-cover" onerror="this.src='{{ asset('images/illustration-no-books.png') }}'">
                         </div>
 
                         <!-- Detail Info -->

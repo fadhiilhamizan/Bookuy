@@ -83,20 +83,7 @@
                 @foreach($recommendedBooks as $book)
                 <a href="{{ route('product.show', $book->id) }}" class="flex-shrink-0 w-32 group">
                     <div class="w-full aspect-[9/16] bg-gray-200 rounded-lg overflow-hidden shadow-sm border border-transparent group-hover:border-blue-300 group-hover:shadow-md transition-all duration-300 relative">
-                        <!-- PERBAIKAN LOGIKA GAMBAR -->
-                        @php
-                            $imgSrc = asset('images/illustration-no-books.png');
-                            if (isset($book->gambar_buku) && !empty($book->gambar_buku)) {
-                                $img = is_array($book->gambar_buku) ? $book->gambar_buku[0] : $book->gambar_buku;
-                                if (Illuminate\Support\Str::startsWith($img, 'http')) {
-                                    $imgSrc = $img;
-                                } else {
-                                    $filename = basename($img);
-                                    $imgSrc = asset('books/' . $filename);
-                                }
-                            }
-                        @endphp
-                        <img src="{{ $imgSrc }}" alt="{{ $book->judul_buku }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <img src="{{ $book->cover_url }}" alt="{{ $book->judul_buku }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
                         <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300"></div>
                     </div>
                 </a>
@@ -122,20 +109,7 @@
                     <div class="flex gap-3">
                         <a href="{{ route('product.show', $book->id) }}" class="flex-shrink-0 w-20 h-28 overflow-hidden rounded-lg relative">
                             <div class="w-full h-full bg-gray-200">
-                                <!-- PERBAIKAN LOGIKA GAMBAR -->
-                                @php
-                                    $imgSrc = asset('images/illustration-no-books.png');
-                                    if (isset($book->gambar_buku) && !empty($book->gambar_buku)) {
-                                        $img = is_array($book->gambar_buku) ? $book->gambar_buku[0] : $book->gambar_buku;
-                                        if (Illuminate\Support\Str::startsWith($img, 'http')) {
-                                            $imgSrc = $img;
-                                        } else {
-                                            $filename = basename($img);
-                                            $imgSrc = asset('books/' . $filename);
-                                        }
-                                    }
-                                @endphp
-                                <img src="{{ $imgSrc }}" alt="{{ $book->judul_buku }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+                                <img src="{{ $book->cover_url }}" alt="{{ $book->judul_buku }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
                             </div>
                         </a>
 

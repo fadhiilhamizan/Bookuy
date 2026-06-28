@@ -71,16 +71,6 @@ Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add')->midd
 Route::post('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update')->middleware('auth');
 Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove')->middleware('auth');
 
-/**
- * Rute Search (DIEDIT)
- * Menggunakan SearchController
- */
-Route::get('/search', [SearchController::class, 'index'])->name('search.index')->middleware('auth');
-
-// Rute untuk menghapus recent search
-Route::post('/search/clear', [SearchController::class, 'clearRecent'])->name('search.clear')->middleware('auth');
-Route::post('/search/remove', [SearchController::class, 'removeRecent'])->name('search.remove')->middleware('auth');
-
 // --- Rute Nav Bar & Profile ---
 Route::middleware('auth')->group(function () {
     Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
@@ -105,17 +95,6 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/review/store', [ProductController::class, 'storeReview'])->name('review.store'); // <-- BARU
 });
-
-// Product Create (Jual Buku)
-Route::get('/sell', [ProductController::class, 'create'])->name('product.create')->middleware('auth');
-Route::post('/sell', [ProductController::class, 'store'])->name('product.store')->middleware('auth');
-
-// Product Detail
-Route::get('/product/{id}', [ProductController::class, 'show'])->name('product.show')->middleware('auth');
-
-// Product Edit & Update (BARU)
-Route::get('/product/{id}/edit', [ProductController::class, 'edit'])->name('product.edit')->middleware('auth');
-Route::post('/product/{id}/update', [ProductController::class, 'update'])->name('product.update')->middleware('auth');
 
 // Group Rute Address & Payment dengan Middleware Auth
 Route::middleware('auth')->group(function () {

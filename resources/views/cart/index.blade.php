@@ -93,26 +93,7 @@
 
                     <!-- Gambar -->
                     <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 border border-gray-200 relative">
-                        <!-- PERBAIKAN LOGIKA GAMBAR -->
-                        @php
-                            $imgSrc = asset('images/illustration-no-books.png'); // Default fallback
-                            
-                            // Cek jika gambar ada
-                            if (isset($item->book->gambar_buku) && !empty($item->book->gambar_buku)) {
-                                // Ambil elemen pertama jika array, atau string langsung
-                                $img = is_array($item->book->gambar_buku) ? $item->book->gambar_buku[0] : $item->book->gambar_buku;
-                                
-                                if (Illuminate\Support\Str::startsWith($img, 'http')) {
-                                    $imgSrc = $img;
-                                } else {
-                                    // REVISI: Mengambil file dari folder 'public/books'
-                                    // basename() digunakan untuk membuang path lama (misal: 'post-images/foto.jpg' menjadi 'foto.jpg')
-                                    $filename = basename($img);
-                                    $imgSrc = asset('books/' . $filename);
-                                }
-                            }
-                        @endphp
-                        <img src="{{ $imgSrc }}" class="w-full h-full object-cover absolute inset-0" onerror="this.src='{{ asset('images/illustration-no-books.png') }}'">
+                        <img src="{{ $item->book->cover_url }}" class="w-full h-full object-cover absolute inset-0" onerror="this.src='{{ asset('images/illustration-no-books.png') }}'">
                     </div>
 
                     <!-- Detail Info -->

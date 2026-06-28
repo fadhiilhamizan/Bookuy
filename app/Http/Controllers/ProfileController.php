@@ -94,7 +94,8 @@ class ProfileController extends Controller
         $tab = $request->query('tab', 'ongoing'); // ongoing | completed
 
         // Ambil order di mana user adalah PEMBELI (buyer_id)
-        $query = Order::with(['book', 'seller'])
+        // 'book' di-eager-load untuk mencegah N+1 di view; 'seller' tidak dipakai view ini.
+        $query = Order::with('book')
                       ->where('buyer_id', $user->id);
 
         if ($tab == 'completed') {
