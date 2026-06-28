@@ -12,144 +12,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bookuy</title>
 
-    <!-- Memuat Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <!-- Memuat Google Fonts (Poppins) -->
+    <!-- Google Fonts (Poppins) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Konfigurasi Tailwind untuk Font Kustom -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        // Daftarkan 'font-sugo' untuk memanggil font kustom kita
-                        'sugo': ['Sugo Pro Display', 'sans-serif'],
-
-                        // Daftarkan 'font-poppins' sebagai default
-                        'poppins': ['Poppins', 'sans-serif'],
-                    },
-                },
-            },
-        }
-    </script>
-
-    <!-- CSS Kustom (Termasuk Font Kustom & Bingkai) -->
-    <style>
-        /* Memuat file font kustom .ttf Anda dari public/fonts/ */
-        @font-face {
-            font-family: 'Sugo Pro Display'; /* Kita beri nama ini */
-
-            /* Pastikan nama file di bawah ini SAMA PERSIS
-              dengan nama file font yang Anda letakkan di public/fonts/
-            */
-            src: url('{{ asset('fonts/Sugo-Pro-Classic-Regular-trial.ttf') }}') format('truetype');
-
-            /* 'Paksa' font ini untuk merespons class 'font-bold' */
-            font-weight: 700; /* 700 (bold) */
-            font-style: normal;
-        }
-
-        /* CSS untuk Bingkai Handphone (iPhone 14) */
-        body {
-            background-color: #1a1a1a; /* Latar belakang gelap agar handphone terlihat */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            /* DIEDIT: Font default adalah Poppins, BUKAN Inter */
-            font-family: 'Poppins', sans-serif;
-            padding: 2rem 0;
-        }
-
-        .iphone-frame {
-            width: 400px; /* Lebar iPhone 14 sekitar 390px */
-            height: 850px; /* Tinggi iPhone 14 sekitar 844px */
-            background: #111;
-            border-radius: 60px; /* Sudut melengkung */
-            border: 10px solid #333;
-            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7), inset 0 0 0 2px #000, inset 0 0 0 8px #222;
-            padding: 10px;
-            position: relative;
-            box-sizing: border-box;
-        }
-
-        .iphone-screen {
-            background: #ffffff;
-            width: 100%;
-            height: 100%;
-            border-radius: 40px; /* Sudut melengkung dalam */
-            overflow: hidden; /* Memastikan konten tidak keluar dari layar */
-            position: relative; /* DIEDIT: Menjadi 'anchor' untuk Nav Bar */
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* Notch (poni) di atas layar */
-        .iphone-notch {
-            width: 180px;
-            height: 30px;
-            background: #111;
-            position: absolute;
-            top: 0px; /* Posisi pas dari atas */
-            left: 50%;
-            transform: translateX(-50%);
-            border-radius: 0 0 20px 20px;
-            z-index: 50;
-        }
-
-        /* Konten aplikasi */
-        .app-content {
-            flex-grow: 1;
-            overflow-y: auto; /* Membuat konten bisa di-scroll vertikal */
-            overflow-x: hidden; /* FIX: Mencegah scroll horizontal pada halaman utama */
-            position: relative;
-            width: 100%; /* Pastikan lebar tidak melebihi parent */
-        }
-
-        /* Spinner styles (untuk splash screen) */
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 6px solid rgba(255, 255, 255, 0.3);
-            border-top-color: #FFFFFF;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-    </style>
+    <!-- Compiled CSS + JS (Tailwind, app shell, dual-view) -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <!-- Slot untuk CSS tambahan per halaman -->
     @stack('styles')
 </head>
 
-<body>
+<body data-view-mode="{{ $viewMode ?? 'mobile' }}" class="@yield('body-class')">
 
-    <!-- Bingkai Handphone -->
-    <div class="iphone-frame">
-        <!-- Layar Handphone -->
-        <div class="iphone-screen">
-            <!-- Poni (Notch) -->
-            <div class="iphone-notch"></div>
+    <!-- App shell: renders as an iPhone mockup (mobile) or a full-width canvas (desktop) -->
+    <div class="app-shell">
+        <div class="app-screen">
+            @if(($viewMode ?? 'mobile') === 'mobile')
+                <div class="iphone-notch"></div>
+            @endif
 
-            <!-- DIEDIT: Area Konten yang bisa di-scroll -->
+            <!-- Scrollable content area -->
             <div class="app-content">
                 @yield('content')
             </div>
 
-            <!-- DIEDIT: Slot BARU untuk Nav Bar (Statis, di luar area scroll) -->
+            <!-- Navigation (filled by pages that extend layouts.app-main) -->
             @stack('navbar')
         </div>
     </div>
+
+    <!-- Dual-view toggle -->
+    @php($isDesktop = ($viewMode ?? 'mobile') === 'desktop')
+    <a href="{{ route('viewmode.toggle') }}" class="view-toggle"
+       title="{{ $isDesktop ? 'Switch to mobile mockup' : 'Switch to desktop view' }}"
+       aria-label="{{ $isDesktop ? 'Switch to mobile mockup' : 'Switch to desktop view' }}">
+        @if($isDesktop)
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+            <span>Mobile view</span>
+        @else
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            <span>Desktop view</span>
+        @endif
+    </a>
 
     <!-- Slot untuk JS tambahan per halaman -->
     @stack('scripts')

@@ -19,12 +19,16 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CourierController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\ViewModeController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
 */
+
+// Dual-view toggle (mobile mockup <-> full-width desktop). Open to guests too.
+Route::get('/view-mode/toggle', [ViewModeController::class, 'toggle'])->name('viewmode.toggle');
 
 // ... Rute Splash dan Onboarding ...
 Route::get('/', function () { return view('splash'); });

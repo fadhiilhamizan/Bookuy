@@ -12,7 +12,7 @@
 @push('styles')
 <style>
     /* Kita mereset padding-bottom dari layout utama agar tidak ada ruang kosong besar */
-    body .iphone-screen .app-content {
+    body .app-screen .app-content {
         padding-bottom: 0 !important;
     }
 </style>

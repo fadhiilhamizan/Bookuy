@@ -9,8 +9,6 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\View;
-use App\Http\View\Composers\CartComposer;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,9 +25,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Terapkan CartComposer ke layout utama dan halaman produk
-        // '*' berarti semua view, tapi lebih efisien jika spesifik
-        // Kita gunakan '*' agar aman di semua halaman yang mungkin punya header keranjang
-        View::composer('*', CartComposer::class);
+        // Layout data (cart badge + dual-view mode) is now shared once per
+        // request via the ShareLayoutData middleware instead of a View::composer('*'),
+        // which used to re-run the cart query on every individual view render.
     }
 }

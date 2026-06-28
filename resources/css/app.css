@@ -1,11 +1,339 @@
-@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+/*
+| ----------------------------------------------------------------------------
+| Bookuy global stylesheet (compiled via Vite — replaces the old Tailwind CDN)
+| ----------------------------------------------------------------------------
+| Author: Fadhiil Akmal Hamizan (Github: Axmalz)
+|
+| This file owns the app shell: the mobile mockup frame, the dual-view
+| (mobile vs desktop) wrapper, and the navigation chrome. Page-specific styles
+| stay in their own views via @push('styles').
+*/
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+/* ===== Custom font ===== */
+@font-face {
+    font-family: 'Sugo Pro Display';
+    src: url('/fonts/Sugo-Pro-Classic-Regular-trial.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Hide scrollbars on horizontal carousels (kept as a reusable utility) */
+.no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* ===== Loading spinner (splash / generic) ===== */
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 6px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/*
+| ============================================================================
+| DUAL-VIEW APP SHELL
+| The same markup (.app-shell > .app-screen > .app-content) renders either as
+| an iPhone mockup (data-view-mode="mobile") or a full-width desktop canvas
+| (data-view-mode="desktop"). Per-view content never has to change.
+| ============================================================================
+*/
+
+.app-content {
+    position: relative;
+    width: 100%;
+}
+
+/* ---------- MOBILE: iPhone-14 mockup frame ---------- */
+body[data-view-mode='mobile'] {
+    background-color: #1a1a1a; /* dark backdrop around the phone */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem 0;
+}
+
+body[data-view-mode='mobile'] .app-shell {
+    width: 400px;
+    height: 850px;
+    flex-shrink: 0;
+    background: #111;
+    border-radius: 60px;
+    border: 10px solid #333;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.7), inset 0 0 0 2px #000, inset 0 0 0 8px #222;
+    padding: 10px;
+    position: relative;
+    box-sizing: border-box;
+}
+
+body[data-view-mode='mobile'] .app-screen {
+    background: #ffffff;
+    width: 100%;
+    height: 100%;
+    border-radius: 40px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+body[data-view-mode='mobile'] .app-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Notch (only rendered in mobile mode) */
+.iphone-notch {
+    width: 180px;
+    height: 30px;
+    background: #111;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 0 0 20px 20px;
+    z-index: 50;
+}
+
+/* ---------- DESKTOP: full-width web canvas ---------- */
+body[data-view-mode='desktop'] {
+    background-color: #f1f5f9; /* slate-100 surface behind the canvas */
+    min-height: 100vh;
+}
+
+body[data-view-mode='desktop'] .app-shell {
+    width: 100%;
+    min-height: 100vh;
+}
+
+body[data-view-mode='desktop'] .app-screen {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Centered content canvas — wide enough to feel like a desktop web app.
+   Per-view multi-column density is layered on in the UI-polish phase. */
+body[data-view-mode='desktop'] .app-content {
+    width: 100%;
+    max-width: 1024px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: #ffffff;
+    box-shadow: 0 0 60px rgba(15, 23, 42, 0.06);
+}
+
+body[data-view-mode='desktop'] .iphone-notch {
+    display: none;
+}
+
+/*
+| ============================================================================
+| NAVIGATION
+| Pages that opt in (via @section('body-class','has-nav')) get the bottom tab
+| bar on mobile and a sticky top bar on desktop — same links, different chrome.
+| ============================================================================
+*/
+
+/* Reserve space so fixed/absolute nav never covers content */
+body[data-view-mode='mobile'].has-nav .app-content {
+    padding-bottom: 180px;
+}
+body[data-view-mode='desktop'].has-nav .app-content {
+    padding-top: 84px;
+}
+
+/* ---------- MOBILE bottom tab bar ---------- */
+.nav-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 95px;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.nav-bar-bg-img {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 85px;
+    object-fit: cover;
+    pointer-events: auto;
+}
+
+.nav-items {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    position: absolute;
+    bottom: 15px;
+    left: 0;
+    right: 0;
+    height: 65px;
+    padding: 0 1rem;
+    pointer-events: auto;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.nav-item img {
+    width: 28px;
+    height: 28px;
+    filter: grayscale(100%) brightness(200%);
+}
+
+.nav-item.active {
+    transform: translateY(-25px);
+    background-color: #2563eb;
+    border-radius: 50%;
+    width: 64px;
+    height: 64px;
+    border: 5px solid white;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-item.active img {
+    filter: none;
+    width: 32px;
+    height: 32px;
+}
+
+/* ---------- DESKTOP sticky top bar ---------- */
+.desktop-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 68px;
+    z-index: 1000;
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+}
+
+.desktop-nav__brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: #1d4ed8;
+}
+
+.desktop-nav__links {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.desktop-nav__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.9rem;
+    border-radius: 9999px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #475569;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.desktop-nav__link img {
+    width: 20px;
+    height: 20px;
+    filter: grayscale(100%) brightness(0.6);
+}
+
+.desktop-nav__link:hover {
+    background-color: #f1f5f9;
+    color: #1d4ed8;
+}
+
+.desktop-nav__link.active {
+    background-color: #2563eb;
+    color: #ffffff;
+}
+
+.desktop-nav__link.active img {
+    filter: brightness(0) invert(1);
+}
+
+/*
+| ============================================================================
+| VIEW-MODE TOGGLE (floating pill, present in both modes)
+| ============================================================================
+*/
+.view-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1100;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #ffffff;
+    background: #2563eb;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.view-toggle:hover {
+    transform: translateY(-2px);
+    background: #1d4ed8;
+}
+
+.view-toggle svg {
+    width: 16px;
+    height: 16px;
 }

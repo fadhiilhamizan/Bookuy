@@ -16,7 +16,7 @@
        dan background putihnya sampai ke paling bawah di belakang navbar.
        Kita gunakan selector spesifik agar menang dari style default.
     */
-    body .iphone-screen .app-content {
+    body .app-screen .app-content {
         padding-bottom: 0 !important;
     }
 </style>
