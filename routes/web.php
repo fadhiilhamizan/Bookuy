@@ -41,7 +41,7 @@ Route::get('/onboarding', function () { return view('onboarding.1'); }); // <-- 
 Route::get('/signup', [AuthController::class, 'showRegisterForm'])->name('register.form');
 Route::post('/signup', [AuthController::class, 'register'])->name('register');
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+Route::post('/login', [AuthController::class, 'login'])->name('login.post')->middleware('throttle:6,1');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
@@ -120,11 +120,14 @@ Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.in
 Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process')->middleware('auth');
 Route::get('/checkout/success/{orderId}', [CheckoutController::class, 'success'])->name('checkout.success')->middleware('auth');
 Route::get('/track-order/{id}', [CheckoutController::class, 'track'])->name('order.track')->middleware('auth');
+Route::post('/order-item/{id}/return', [CheckoutController::class, 'returnRental'])->name('order.return')->middleware('auth');
 
-// Courier Dashboard Routes (Tanpa Auth Middleware khusus untuk demo mudah)
-Route::get('/kurir', [CourierController::class, 'index'])->name('courier.index');
-Route::post('/kurir/update/{id}', [CourierController::class, 'updateStatus'])->name('courier.update');
-Route::get('/kurir/stats', [CourierController::class, 'statistics'])->name('courier.stats');
+// Courier Dashboard — admin-only (courier-role accounts can be added later).
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/kurir', [CourierController::class, 'index'])->name('courier.index');
+    Route::post('/kurir/update/{id}', [CourierController::class, 'updateStatus'])->name('courier.update');
+    Route::get('/kurir/stats', [CourierController::class, 'statistics'])->name('courier.stats');
+});
 
 Route::get('/notifications', [NotificationController::class, 'index'])->name('notification.index')->middleware('auth');
 

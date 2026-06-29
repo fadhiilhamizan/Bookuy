@@ -15,7 +15,13 @@ use Illuminate\Support\Str;
 class Book extends Model
 {
     use HasFactory;
-    protected $guarded = [];
+
+    protected $fillable = [
+        'judul_buku', 'nama_penulis', 'harga_beli', 'harga_sewa',
+        'stok_beli', 'stok_sewa', 'gambar_buku', 'deskripsi_buku',
+        'user_id', 'kondisi_buku', 'alamat_buku', 'category_id',
+        'jumlah_halaman', 'semester',
+    ];
 
     protected $casts = [
         'gambar_buku' => 'array',

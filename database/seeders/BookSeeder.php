@@ -820,14 +820,17 @@ class BookSeeder extends Seeder
             'user_id' => User::inRandomOrder()->first()->id
         ]);
 
-        // Buat Reviews
+        // Buat Reviews — pilih reviewer yang UNIK per buku agar tidak melanggar
+        // unique(user_id, book_id).
+        $userIds = User::pluck('id');
         $allBooks = Book::all();
         foreach ($allBooks as $book) {
-            $numberOfReviews = rand(10, 25);
-            for ($j = 0; $j < $numberOfReviews; $j++) {
+            $numberOfReviews = min(rand(10, 25), $userIds->count());
+            $reviewerIds = $userIds->shuffle()->take($numberOfReviews);
+            foreach ($reviewerIds as $reviewerId) {
                 Review::factory()->create([
                     'book_id' => $book->id,
-                    'user_id' => User::inRandomOrder()->first()->id,
+                    'user_id' => $reviewerId,
                 ]);
             }
         }

@@ -22,10 +22,8 @@ class IsAdmin
             return redirect('/login');
         }
 
-        // 2. LOGIKA KUNCI: Cek apakah ID user adalah 1
-        // Anda bisa mengganti angka 1 dengan ID admin yang sebenarnya
-        if (Auth::user()->id !== 1) {
-            // Jika bukan ID 1, batalkan akses (403 Forbidden)
+        // 2. Role-based admin check (replaces the brittle hardcoded user id === 1).
+        if (Auth::user()->role !== 'admin') {
             abort(403, 'ANDA TIDAK MEMILIKI AKSES KE HALAMAN INI.');
         }
 

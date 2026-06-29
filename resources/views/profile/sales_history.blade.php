@@ -46,43 +46,43 @@
     <!-- 2. Konten List (Scrollable) -->
     <div class="flex-grow overflow-y-auto px-6 pt-6 pb-10 bg-white no-scrollbar">
 
-        @if($orders->count() > 0)
+        @if($items->count() > 0)
             <div class="space-y-4">
-                @foreach($orders as $order)
+                @foreach($items as $item)
                 <!-- Item Card -->
                 <div class="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm relative">
 
                     <!-- Status Badge (Pojok Kanan Atas) -->
                     <div class="absolute top-4 right-4 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide
-                        @if($order->status == 'Delivered') bg-green-100 text-green-600
-                        @elseif($order->status == 'In Transit') bg-yellow-100 text-yellow-700
+                        @if($item->order->status == 'Delivered') bg-green-100 text-green-600
+                        @elseif($item->order->status == 'In Transit') bg-yellow-100 text-yellow-700
                         @else bg-gray-100 text-gray-600 @endif">
-                        {{ $order->status == 'Delivered' ? 'Completed' : $order->status }}
+                        {{ $item->order->status == 'Delivered' ? 'Completed' : $item->order->status }}
                     </div>
 
                     <div class="flex gap-4">
                         <!-- Foto Buku -->
                         <div class="w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 border border-gray-200">
-                            <img src="{{ $order->book->cover_url }}" class="w-full h-full object-cover" onerror="this.src='{{ asset('images/illustration-no-books.png') }}'">
+                            <img src="{{ $item->book?->cover_url ?? asset('images/illustration-no-books.png') }}" class="w-full h-full object-cover" onerror="this.src='{{ asset('images/illustration-no-books.png') }}'">
                         </div>
 
                         <!-- Detail Info -->
                         <div class="flex-grow min-w-0 flex flex-col justify-center">
                             <!-- Judul -->
-                            <h4 class="font-bold text-gray-800 text-sm truncate leading-tight pr-20" title="{{ $order->book->judul_buku }}">
-                                {{ $order->book->judul_buku }}
+                            <h4 class="font-bold text-gray-800 text-sm truncate leading-tight pr-20" title="{{ $item->book_title }}">
+                                {{ $item->book_title }}
                             </h4>
 
                             <!-- Meta Info -->
                             <div class="flex items-center text-xs text-gray-400 mt-1 mb-2">
-                                <span class="capitalize">{{ $order->type }}</span>
+                                <span class="capitalize">{{ $item->type }}</span>
                                 <span class="mx-1.5">|</span>
-                                <span class="capitalize">{{ $order->book->kondisi_buku }}</span>
+                                <span class="font-medium text-gray-500">x{{ $item->quantity }}</span>
                             </div>
 
                             <!-- Harga -->
                             <div class="text-blue-600 font-bold text-base">
-                                Rp {{ number_format($order->price, 0, ',', '.') }}
+                                Rp {{ number_format($item->subtotal, 0, ',', '.') }}
                             </div>
                         </div>
                     </div>
@@ -90,8 +90,7 @@
                     <!-- Tombol Track Order (Hanya di Ongoing) -->
                     @if($tab == 'ongoing')
                     <div class="flex justify-end mt-3 border-t border-gray-50 pt-3">
-                        <!-- Placeholder Link -->
-                        <a href="{{ route('order.track', $order->id) }}" class="bg-blue-600 text-white text-xs font-bold px-6 py-2 rounded-full shadow-md hover:bg-blue-700 transition-colors">
+                        <a href="{{ route('order.track', $item->order_id) }}" class="bg-blue-600 text-white text-xs font-bold px-6 py-2 rounded-full shadow-md hover:bg-blue-700 transition-colors">
                             Track Order
                         </a>
                     </div>

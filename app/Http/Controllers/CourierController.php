@@ -23,7 +23,7 @@ class CourierController extends Controller
 
         // Ambil order yang ditugaskan ke kurir ini
         $orders = Order::where('courier_name', $selectedCourier)
-                       ->with(['book', 'buyer', 'seller'])
+                       ->with(['items.book', 'buyer'])
                        ->orderByDesc('created_at')
                        ->get();
 
@@ -32,22 +32,45 @@ class CourierController extends Controller
 
     public function updateStatus(Request $request, $id)
     {
-        $order = Order::findOrFail($id);
+        $request->validate([
+            'status'  => 'required|in:Packing,Picked,In Transit,Delivered,Cancelled',
+            'message' => 'nullable|string|max:255',
+        ]);
+
+        $order = Order::with('items')->findOrFail($id);
 
         // Validasi: Jika sudah delivered, tidak boleh ubah
         if ($order->status == 'Delivered') {
             return back()->with('error', 'Pesanan sudah selesai!');
         }
 
-        $order->status = $request->status;
+        $newStatus = $request->status;
+
+        // Cancelling an order returns the reserved stock to the catalog.
+        if ($newStatus === 'Cancelled' && $order->status !== 'Cancelled') {
+            DB::transaction(function () use ($order) {
+                foreach ($order->items as $item) {
+                    if (! $item->book_id) continue;
+                    $book = \App\Models\Book::lockForUpdate()->find($item->book_id);
+                    if (! $book) continue;
+                    if ($item->type === 'beli') {
+                        $book->increment('stok_beli', $item->quantity);
+                    } elseif (! $item->returned_at) {
+                        $book->increment('stok_sewa', 1);
+                    }
+                }
+            });
+        }
+
+        $order->status = $newStatus;
         $order->courier_message = $request->message;
         $order->save();
 
-        if ($request->status == 'Delivered') {
+        if ($newStatus === 'Delivered') {
             Notification::create([
                 'user_id' => $order->buyer_id, // Kirim ke pembeli
                 'title'   => 'Order Delivered!',
-                'message' => "Buku '{$order->book->judul_buku}' telah sampai di tujuan.",
+                'message' => 'Pesananmu telah sampai di tujuan.',
                 'type'    => 'transaction',
                 'icon'    => 'icon-notif-truck.png'
             ]);

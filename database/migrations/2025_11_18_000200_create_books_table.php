@@ -27,7 +27,7 @@ return new class extends Migration
 
             $table->text('gambar_buku'); // JSON Array
             $table->text('deskripsi_buku');
-            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->enum('kondisi_buku', ['baru', 'bekas premium', 'bekas usang']);
             $table->string('alamat_buku');
             $table->foreignId('category_id')->constrained('categories');

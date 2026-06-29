@@ -29,19 +29,19 @@
             @csrf
             <div class="mb-5">
                 <label class="block text-sm font-bold text-gray-800 mb-2">Card Number</label>
-                <input type="text" id="card_number" name="card_number" value="{{ $card->card_number }}" maxlength="16" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:border-blue-500 outline-none transition-colors tracking-wider">
-                <p class="text-xs text-gray-400 mt-1 ml-1">Must be 16 digits number</p>
+                <input type="text" id="card_number" name="card_number" placeholder="Current: {{ $card->masked_number }}" maxlength="16" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:border-blue-500 outline-none transition-colors tracking-wider">
+                <p class="text-xs text-gray-400 mt-1 ml-1">Re-enter the full 16-digit number to update this card</p>
             </div>
 
             <div class="flex gap-4 mb-8">
                 <div class="flex-1">
                     <label class="block text-sm font-bold text-gray-800 mb-2">Expiry Date</label>
-                    <input type="text" id="expiry_date" name="expiry_date" value="{{ $card->expiry_date }}" maxlength="5" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:border-blue-500 outline-none transition-colors">
+                    <input type="text" id="expiry_date" name="expiry_date" value="{{ sprintf('%02d/%s', $card->exp_month, substr($card->exp_year, -2)) }}" maxlength="5" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:border-blue-500 outline-none transition-colors">
                     <p class="text-xs text-gray-400 mt-1 ml-1">Format: MM/YY</p>
                 </div>
                 <div class="flex-1 relative">
                     <label class="block text-sm font-bold text-gray-800 mb-2">Security Code</label>
-                    <input type="text" id="cvc" name="cvc" value="{{ $card->cvc }}" maxlength="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:border-blue-500 outline-none transition-colors">
+                    <input type="text" id="cvc" name="cvc" placeholder="CVC" maxlength="3" class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3.5 text-sm focus:border-blue-500 outline-none transition-colors">
                     <img src="{{ asset('images/icon-help.png') }}" class="absolute right-3 top-[38px] w-5 h-5 opacity-50">
                     <p class="text-xs text-gray-400 mt-1 ml-1">3 digits on back</p>
                 </div>

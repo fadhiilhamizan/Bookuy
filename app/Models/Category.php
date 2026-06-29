@@ -14,7 +14,8 @@ use Illuminate\Database\Eloquent\Model;
 class Category extends Model
 {
     use HasFactory;
-    protected $guarded = []; // Izinkan mass assignment
+
+    protected $fillable = ['name', 'icon_path'];
 
     public function books()
     {

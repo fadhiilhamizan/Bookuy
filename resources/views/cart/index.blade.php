@@ -122,7 +122,8 @@
                                 @if($item->type == 'beli')
                                     <!-- Logika Beli -->
                                     @php
-                                        $maxStock = $item->quantity + $item->book->stok_beli;
+                                        // Stock is reserved at checkout, so the full stock is available here.
+                                        $maxStock = $item->book->stok_beli;
                                     @endphp
                                     <button onclick="updateQty({{ $item->id }}, -1, {{ $maxStock }})" class="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-blue-600 transition-colors active:scale-90">
                                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor" class="w-3 h-3"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" /></svg>

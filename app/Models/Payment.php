@@ -14,7 +14,10 @@ use Illuminate\Database\Eloquent\Model;
 class Payment extends Model
 {
     use HasFactory;
-    protected $guarded = [];
+
+    protected $fillable = [
+        'card_type', 'last_four', 'exp_month', 'exp_year', 'is_default',
+    ];
 
     public function user()
     {
@@ -24,7 +27,6 @@ class Payment extends Model
     // Helper untuk format nomor kartu tersembunyi (**** **** **** 1234)
     public function getMaskedNumberAttribute()
     {
-        $last4 = substr($this->card_number, -4);
-        return "**** **** **** " . $last4;
+        return "**** **** **** " . $this->last_four;
     }
 }

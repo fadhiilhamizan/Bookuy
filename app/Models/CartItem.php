@@ -14,11 +14,17 @@ use Illuminate\Database\Eloquent\Model;
 class CartItem extends Model
 {
     use HasFactory;
-    protected $guarded = [];
+
+    protected $fillable = ['cart_id', 'book_id', 'type', 'quantity', 'is_selected'];
 
     public function book()
     {
         return $this->belongsTo(Book::class);
+    }
+
+    public function cart()
+    {
+        return $this->belongsTo(Cart::class);
     }
 
     // Helper untuk menghitung subtotal item ini

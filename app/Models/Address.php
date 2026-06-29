@@ -14,7 +14,8 @@ use Illuminate\Database\Eloquent\Model;
 class Address extends Model
 {
     use HasFactory;
-    protected $guarded = [];
+
+    protected $fillable = ['user_id', 'nickname', 'full_address', 'is_default'];
 
     public function user()
     {

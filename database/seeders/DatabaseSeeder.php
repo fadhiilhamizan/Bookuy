@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Fadhiil',
             'email' => 'fadhiilhamizan2004@gmail.com',
             'password' => bcrypt('12345678'), // Password harus di-hash
+            'role' => 'admin',
         ]);
     }
 

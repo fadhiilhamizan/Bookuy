@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use App\Models\User;
 use App\Models\Order;
+use App\Models\OrderItem;
 
 use App\Models\Notification;
 
@@ -73,18 +74,19 @@ class ProfileController extends Controller
         $user = Auth::user();
         $tab = $request->query('tab', 'ongoing');
 
-        $query = Order::with('book')
+        // Per-item view: the books this user has sold (seller_id on the line item).
+        $query = OrderItem::with(['order', 'book'])
                       ->where('seller_id', $user->id);
 
         if ($tab == 'completed') {
-            $query->where('status', 'Delivered');
+            $query->whereHas('order', fn ($q) => $q->where('status', 'Delivered'));
         } else {
-            $query->whereIn('status', ['Packing', 'Picked', 'In Transit']);
+            $query->whereHas('order', fn ($q) => $q->whereIn('status', ['Packing', 'Picked', 'In Transit']));
         }
 
-        $orders = $query->latest()->get();
+        $items = $query->latest()->get();
 
-        return view('profile.sales_history', compact('orders', 'tab'));
+        return view('profile.sales_history', compact('items', 'tab'));
     }
 
     // == BARU: Method Purchase History (Pembelian) ==
@@ -93,21 +95,18 @@ class ProfileController extends Controller
         $user = Auth::user();
         $tab = $request->query('tab', 'ongoing'); // ongoing | completed
 
-        // Ambil order di mana user adalah PEMBELI (buyer_id)
-        // 'book' di-eager-load untuk mencegah N+1 di view; 'seller' tidak dipakai view ini.
-        $query = Order::with('book')
-                      ->where('buyer_id', $user->id);
+        // Per-item view: the books this user has bought (via their parent orders).
+        $query = OrderItem::with(['order', 'book'])
+                      ->whereHas('order', fn ($q) => $q->where('buyer_id', $user->id));
 
         if ($tab == 'completed') {
-            // Tab Completed: Status Delivered
-            $query->where('status', 'Delivered');
+            $query->whereHas('order', fn ($q) => $q->where('status', 'Delivered'));
         } else {
-            // Tab Ongoing: Status Packing, Picked, In Transit
-            $query->whereIn('status', ['Packing', 'Picked', 'In Transit']);
+            $query->whereHas('order', fn ($q) => $q->whereIn('status', ['Packing', 'Picked', 'In Transit']));
         }
 
-        $orders = $query->latest()->get();
+        $items = $query->latest()->get();
 
-        return view('profile.purchase_history', compact('orders', 'tab'));
+        return view('profile.purchase_history', compact('items', 'tab'));
     }
 }

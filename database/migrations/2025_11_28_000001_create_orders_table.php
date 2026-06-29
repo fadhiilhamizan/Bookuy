@@ -14,20 +14,30 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Parent order: one per checkout (a shipment). Line items live in order_items.
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            // Pastikan tabel 'users' dan 'books' sudah ada sebelum ini dijalankan (karena timestamp lebih baru)
             $table->foreignId('buyer_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('seller_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('book_id')->constrained('books')->onDelete('cascade');
 
-            $table->enum('type', ['beli', 'sewa']);
-            $table->decimal('price', 10, 2);
+            // Address snapshot (survives the address row being deleted).
+            $table->text('shipping_address')->nullable();
+
+            // Money, computed at checkout.
+            $table->decimal('subtotal', 12, 2)->default(0);
+            $table->decimal('shipping_fee', 12, 2)->default(0);
+            $table->decimal('admin_fee', 12, 2)->default(0);
+            $table->decimal('discount_amount', 12, 2)->default(0);
+            $table->decimal('total', 12, 2)->default(0);
+
+            $table->string('promo_code')->nullable();
+            $table->string('payment_method')->default('Card');
 
             $table->enum('status', ['Packing', 'Picked', 'In Transit', 'Delivered', 'Cancelled'])->default('Packing');
-            $table->integer('rating')->nullable();
+            $table->string('courier_name')->nullable();
+            $table->string('courier_message')->nullable();
 
             $table->timestamps();
+            $table->index('status');
         });
     }
 

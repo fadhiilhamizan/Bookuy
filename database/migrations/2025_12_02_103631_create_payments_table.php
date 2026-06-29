@@ -17,10 +17,12 @@ return new class extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->string('card_number'); // Disimpan lengkap untuk simulasi
-            $table->string('expiry_date'); // MM/YY
-            $table->string('cvc');
-            $table->enum('card_type', ['Visa', 'Mastercard']); // Randomly assigned on create
+            // SECURITY: never persist the full PAN or the CVC. Keep only what's needed
+            // to display a saved card (PCI-DSS: CVC must never be stored at rest).
+            $table->enum('card_type', ['Visa', 'Mastercard']);
+            $table->string('last_four', 4);
+            $table->unsignedTinyInteger('exp_month');
+            $table->unsignedSmallInteger('exp_year');
             $table->boolean('is_default')->default(false);
             $table->timestamps();
         });

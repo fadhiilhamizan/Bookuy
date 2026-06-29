@@ -53,11 +53,14 @@ class PaymentController extends Controller
         // Random Card Type (Visa / Mastercard)
         $type = rand(0, 1) ? 'Visa' : 'Mastercard';
 
+        // SECURITY: derive only the displayable bits; never persist the PAN or CVC.
+        [$expMonth, $expYear] = array_pad(explode('/', $request->expiry_date), 2, null);
+
         $user->payments()->create([
-            'card_number' => $request->card_number,
-            'expiry_date' => $request->expiry_date,
-            'cvc' => $request->cvc,
-            'card_type' => $type,
+            'card_type'  => $type,
+            'last_four'  => substr(preg_replace('/\D/', '', $request->card_number), -4),
+            'exp_month'  => (int) $expMonth,
+            'exp_year'   => 2000 + (int) $expYear,
             'is_default' => $isDefault,
         ]);
 
@@ -91,10 +94,12 @@ class PaymentController extends Controller
             'cvc' => 'required|numeric|digits:3',
         ]);
 
+        [$expMonth, $expYear] = array_pad(explode('/', $request->expiry_date), 2, null);
+
         $card->update([
-            'card_number' => $request->card_number,
-            'expiry_date' => $request->expiry_date,
-            'cvc' => $request->cvc,
+            'last_four' => substr(preg_replace('/\D/', '', $request->card_number), -4),
+            'exp_month' => (int) $expMonth,
+            'exp_year'  => 2000 + (int) $expYear,
         ]);
 
         return response()->json(['success' => true]);

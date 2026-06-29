@@ -65,7 +65,7 @@ class ProductController extends Controller
     public function edit($id)
     {
         $book = Book::findOrFail($id);
-        if (Auth::id() !== $book->user_id) abort(403, 'Unauthorized action.');
+        $this->authorize('update', $book);
         $categories = Category::all();
         return view('product.edit', compact('book', 'categories'));
     }
@@ -73,7 +73,7 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         $book = Book::findOrFail($id);
-        if (Auth::id() !== $book->user_id) abort(403, 'Unauthorized action.');
+        $this->authorize('update', $book);
 
         $request->validate([
             'judul_buku' => 'required|string|max:255',
@@ -168,27 +168,36 @@ class ProductController extends Controller
         $request->validate([
             'book_id' => 'required|exists:books,id',
             'rating' => 'required|integer|min:1|max:5',
-            'comment' => 'nullable|string',
-            'order_id' => 'nullable|exists:orders,id'
+            'comment' => 'nullable|string|max:2000',
+            'order_id' => 'nullable|exists:orders,id',
         ]);
 
-        // 1. Simpan Review
-        Review::create([
-            'user_id' => Auth::id(),
-            'book_id' => $request->book_id,
-            'rating' => $request->rating,
-            'comment' => $request->comment ?? '',
-        ]);
+        // Proof of purchase: a *Delivered* order item for this book, bought by this user.
+        $orderItem = \App\Models\OrderItem::where('book_id', $request->book_id)
+            ->whereHas('order', fn ($q) => $q->where('buyer_id', Auth::id())->where('status', 'Delivered'))
+            ->latest()
+            ->first();
 
-        // 2. Update Order Rating
-        if ($request->has('order_id')) {
-            $order = Order::find($request->order_id);
-            if ($order && $order->buyer_id == Auth::id()) {
-                $order->rating = $request->rating;
-                $order->save();
-            }
+        if (! $orderItem) {
+            return back()->with('error', 'Kamu hanya bisa mengulas buku yang sudah kamu beli dan terima.');
         }
 
-        return redirect()->back()->with('success', 'Ulasan berhasil dikirim!');
+        // One review per user per book.
+        if (Review::where('user_id', Auth::id())->where('book_id', $request->book_id)->exists()) {
+            return back()->with('error', 'Kamu sudah pernah mengulas buku ini.');
+        }
+
+        Review::create([
+            'user_id'  => Auth::id(),
+            'book_id'  => $request->book_id,
+            'order_id' => $orderItem->order_id,
+            'rating'   => $request->rating,
+            'comment'  => $request->comment ?? '',
+        ]);
+
+        // Mirror the rating onto the order item (drives the "reviewed" state in purchase history).
+        $orderItem->update(['rating' => $request->rating]);
+
+        return back()->with('success', 'Ulasan berhasil dikirim!');
     }
 }

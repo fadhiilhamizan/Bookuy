@@ -15,8 +15,7 @@ class Notification extends Model
 {
     use HasFactory;
 
-    // Pastikan fillable atau guarded diatur
-    protected $guarded = [];
+    protected $fillable = ['user_id', 'title', 'message', 'type', 'icon', 'is_read'];
 
     // Relasi balik ke user
     public function user()

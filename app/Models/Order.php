@@ -14,20 +14,20 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     use HasFactory;
-    protected $guarded = [];
 
-    public function book()
-    {
-        return $this->belongsTo(Book::class);
-    }
+    protected $fillable = [
+        'buyer_id', 'shipping_address', 'subtotal', 'shipping_fee', 'admin_fee',
+        'discount_amount', 'total', 'promo_code', 'payment_method', 'status',
+        'courier_name', 'courier_message',
+    ];
 
     public function buyer()
     {
         return $this->belongsTo(User::class, 'buyer_id');
     }
 
-    public function seller()
+    public function items()
     {
-        return $this->belongsTo(User::class, 'seller_id');
+        return $this->hasMany(OrderItem::class);
     }
 }

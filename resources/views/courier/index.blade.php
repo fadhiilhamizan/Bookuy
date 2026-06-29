@@ -52,28 +52,32 @@
                 {{ $order->status }}
             </div>
 
-            <div class="flex gap-4 mt-2">
-                <!-- Book Image -->
-                <div class="w-20 h-28 flex-shrink-0 bg-gray-100 rounded-xl overflow-hidden shadow-inner">
-                    <img src="{{ $order->book->cover_url }}"
-                         class="w-full h-full object-cover" alt="Book" onerror="this.src='{{ asset('images/illustration-no-books.png') }}'">
+            <div class="mt-2">
+                <!-- Recipient + address -->
+                <div class="text-xs text-gray-500 space-y-1 mb-3 pr-20">
+                    <div class="flex items-center gap-1">
+                        <img src="{{ asset('images/icon-profile.png') }}" class="w-3 h-3 opacity-50" onerror="this.style.display='none'">
+                        <span>Penerima: <span class="font-semibold text-gray-700">{{ $order->buyer->name }}</span></span>
+                    </div>
+                    <div class="flex items-start gap-1">
+                        <img src="{{ asset('images/icon-location-pin.png') }}" class="w-3 h-3 opacity-50 mt-0.5">
+                        <span class="line-clamp-2">{{ $order->shipping_address }}</span>
+                    </div>
                 </div>
 
-                <!-- Details -->
-                <div class="flex-grow flex flex-col justify-between">
-                    <div>
-                        <h3 class="font-bold text-gray-800 leading-tight line-clamp-2">{{ $order->book->judul_buku }}</h3>
-                        <div class="mt-2 text-xs text-gray-500 space-y-1">
-                            <div class="flex items-center gap-1">
-                                <img src="{{ asset('images/icon-profile.png') }}" class="w-3 h-3 opacity-50" onerror="this.style.display='none'">
-                                <span>Penerima: <span class="font-semibold text-gray-700">{{ $order->buyer->name }}</span></span>
-                            </div>
-                            <div class="flex items-center gap-1">
-                                <img src="{{ asset('images/icon-location-pin.png') }}" class="w-3 h-3 opacity-50">
-                                <span class="line-clamp-1">Lokasi Seller: {{ $order->book->alamat_buku }}</span>
-                            </div>
+                <!-- Items in this shipment -->
+                <div class="space-y-2">
+                    @foreach($order->items as $line)
+                    <div class="flex items-center gap-3 bg-gray-50 rounded-xl p-2">
+                        <div class="w-10 h-12 flex-shrink-0 bg-gray-100 rounded-md overflow-hidden">
+                            <img src="{{ $line->book?->cover_url ?? asset('images/illustration-no-books.png') }}" class="w-full h-full object-cover" onerror="this.src='{{ asset('images/illustration-no-books.png') }}'">
+                        </div>
+                        <div class="min-w-0 flex-grow">
+                            <p class="text-xs font-semibold text-gray-800 line-clamp-1">{{ $line->book_title }}</p>
+                            <p class="text-[10px] text-gray-400 capitalize">{{ $line->type }} • x{{ $line->quantity }}</p>
                         </div>
                     </div>
+                    @endforeach
                 </div>
             </div>
 
@@ -97,6 +101,7 @@
                                 <option value="Picked" {{ $order->status == 'Picked' ? 'selected' : '' }}>🛵 Picked Up</option>
                                 <option value="In Transit" {{ $order->status == 'In Transit' ? 'selected' : '' }}>🚚 In Transit</option>
                                 <option value="Delivered" {{ $order->status == 'Delivered' ? 'selected' : '' }}>✅ Delivered</option>
+                                <option value="Cancelled" {{ $order->status == 'Cancelled' ? 'selected' : '' }}>❌ Cancelled</option>
                             </select>
                             <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                                 <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>

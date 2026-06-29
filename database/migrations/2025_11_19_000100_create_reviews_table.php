@@ -16,11 +16,15 @@ return new class extends Migration
     {
         Schema::create('reviews', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users'); // Pembeli
-            $table->foreignId('book_id')->constrained('books');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // Pembeli
+            $table->foreignId('book_id')->constrained('books')->onDelete('cascade');
+            $table->foreignId('order_id')->nullable(); // provenance; FK added with the orders rebuild (Phase B)
             $table->integer('rating'); // 1-5
             $table->text('comment');
             $table->timestamps();
+
+            // One review per user per book (prevents duplicate / spammed ratings).
+            $table->unique(['user_id', 'book_id']);
         });
     }
 

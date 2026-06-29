@@ -29,6 +29,7 @@ return new class extends Migration
             $table->enum('gender', ['Male', 'Female', 'Prefer not to say'])->nullable();
             $table->string('semester')->nullable(); // String agar bisa simpan "Tidak ada"
             $table->text('description')->nullable();
+            $table->enum('role', ['user', 'admin', 'courier'])->default('user');
             // ================================================
 
             $table->rememberToken();
