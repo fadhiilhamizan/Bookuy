@@ -137,13 +137,13 @@ class CheckoutController extends Controller
             return redirect()->route('cart.index')->with('error', $e->getMessage());
         }
 
-        Notification::create([
-            'user_id' => $user->id,
-            'title'   => 'Order Placed!',
-            'message' => 'Checkout berhasil! Pesananmu sedang diproses oleh penjual.',
-            'type'    => 'transaction',
-            'icon'    => 'icon-notif-shopping-bag.png',
-        ]);
+        app(\App\Services\NotificationService::class)->send(
+            $user->id,
+            'Order Placed!',
+            'Checkout berhasil! Pesananmu sedang diproses oleh penjual.',
+            'transaction',
+            'icon-notif-shopping-bag.png'
+        );
 
         return redirect()->route('checkout.success', ['orderId' => $orderId]);
     }

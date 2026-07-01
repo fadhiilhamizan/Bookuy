@@ -64,13 +64,13 @@ class PaymentController extends Controller
             'is_default' => $isDefault,
         ]);
 
-        Notification::create([
-            'user_id' => $user->id,
-            'title'   => 'Payment Method Added!',
-            'message' => "Kartu {$type} Anda berhasil ditambahkan.",
-            'type'    => 'account',
-            'icon'    => 'icon-notif-credit-card.png'
-        ]);
+        app(\App\Services\NotificationService::class)->send(
+            $user->id,
+            'Payment Method Added!',
+            "Kartu {$type} Anda berhasil ditambahkan.",
+            'account',
+            'icon-notif-credit-card.png'
+        );
 
         // Response JSON untuk handle popup sukses di frontend
         return response()->json(['success' => true]);

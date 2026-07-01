@@ -94,20 +94,24 @@
                 </div>
                 @error('password') <span class="text-red-300 text-sm mt-1">{{ $message }}</span> @enderror
             </div>
+
+            <!-- Confirm Password -->
+            <div class="form-group">
+                <label for="password_confirmation" class="text-white font-medium mb-2 block">Confirm Password</label>
+                <div class="input-wrapper relative flex items-center w-full px-5 py-3.5 border-2 border-white/50 bg-white/10 rounded-full transition-all duration-300">
+                    <input type="password" name="password_confirmation" id="password_confirmation" placeholder="Re-enter your password" class="flex-1 min-w-0 bg-transparent text-white placeholder-white/70 outline-none border-none p-0">
+                    <svg class="validation-icon w-6 h-6 text-yellow-400 hidden flex-shrink-0 ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+            </div>
         </div>
 
         <!-- ... (Sisa kode HTML sama: Terms, Button, Social, Login Link) ... -->
         <p class="text-white/80 text-center text-sm mt-5">
             By signing up you agree to our <span class="underline">Terms</span>, <span class="underline">Privacy Policy</span>, and <span class="underline">Cookie Use</span>.
         </p>
-        <button id="signup-button" type="submit" disabled class="w-full py-4 mt-5 rounded-full text-lg font-semibold transition-all duration-300 bg-gray-400 text-gray-600 cursor-not-allowed">Sign Up</button>
-        <div class="flex items-center justify-center my-6">
-            <div class="flex-grow h-px bg-white/30"></div><span class="px-4 text-white/80 font-medium">Or</span><div class="flex-grow h-px bg-white/30"></div>
-        </div>
-        <div class="space-y-4">
-            <a href="#" class="flex items-center justify-center w-full bg-white py-3.5 rounded-full text-black font-semibold text-center"><img src="{{ asset('images/logo-google.png') }}" alt="Google" class="w-6 h-6 mr-3">Sign Up with Google</a>
-            <a href="#" class="flex items-center justify-center w-full bg-white py-3.5 rounded-full text-black font-semibold text-center"><img src="{{ asset('images/logo-facebook.png') }}" alt="Facebook" class="w-6 h-6 mr-3">Sign Up with Facebook</a>
-        </div>
+        <button id="signup-button" type="submit" class="w-full py-4 mt-6 rounded-full text-lg font-semibold transition-all duration-300 bg-yellow-400 text-blue-600 hover:bg-yellow-300 active:scale-[0.98] shadow-lg">Sign Up</button>
         <div class="flex-grow"></div>
         <p class="text-white/80 text-center text-base mt-8 mb-4">Already have an account? <a href="{{ route('login') }}" class="font-bold text-white underline">Log In</a></p>
 
@@ -124,6 +128,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const passwordInput = document.getElementById('password');
     const signupButton = document.getElementById('signup-button');
     const passwordToggle = document.getElementById('password-toggle');
+    const confirmInput = document.getElementById('password_confirmation');
 
     function validateField(field) {
         const value = field.value.trim();
@@ -148,25 +153,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Visual validation feedback only — the submit button stays enabled and the
+    // server is the source of truth for validation (incl. password confirmation).
     function checkFormValidity() {
-        const isFullnameValid = validateField(fullnameInput);
-        const isEmailValid = validateField(emailInput);
-        const isPasswordValid = validateField(passwordInput);
-        updateFieldStyle(fullnameInput, isFullnameValid);
-        updateFieldStyle(emailInput, isEmailValid);
-        updateFieldStyle(passwordInput, isPasswordValid);
-        if (isFullnameValid && isEmailValid && isPasswordValid) {
-            signupButton.disabled = false;
-            signupButton.classList.remove('bg-gray-400', 'text-gray-600', 'cursor-not-allowed');
-            signupButton.classList.add('bg-yellow-400', 'text-blue-600');
-        } else {
-            signupButton.disabled = true;
-            signupButton.classList.add('bg-gray-400', 'text-gray-600', 'cursor-not-allowed');
-            signupButton.classList.remove('bg-yellow-400', 'text-blue-600');
-        }
+        updateFieldStyle(fullnameInput, validateField(fullnameInput));
+        updateFieldStyle(emailInput, validateField(emailInput));
+        updateFieldStyle(passwordInput, validateField(passwordInput));
+        updateFieldStyle(confirmInput, confirmInput.value.length >= 8 && confirmInput.value === passwordInput.value);
     }
 
-    [fullnameInput, emailInput, passwordInput].forEach(input => { input.addEventListener('input', checkFormValidity); });
+    [fullnameInput, emailInput, passwordInput, confirmInput].forEach(input => { input.addEventListener('input', checkFormValidity); });
 
     // Toggle Password
     passwordToggle.addEventListener('click', function() {

@@ -6,6 +6,8 @@
 // NRP   : 5026231128
 // Kelas : PPPL B
 -->
+@section('body-class', 'has-nav page-wide')
+
 @section('main-content')
 <div class="w-full h-full bg-white">
 
@@ -55,7 +57,7 @@
                 <h3 class="text-xl font-bold text-gray-900">Kategori</h3>
                 <p class="text-xs text-gray-500">Pilih Kategori Bidang yang Kamu Inginkan</p>
             </div>
-            <a href="{{ route('search.index') }}" class="bg-yellow-400 text-yellow-900 text-[9px] font-bold px-1 py-1 rounded-full inline-flex items-center justify-center w-2/5 hover:bg-yellow-500 transition-colors text-center">
+            <a href="{{ route('search.index') }}" class="bg-yellow-400 text-yellow-900 text-xs font-bold px-4 py-2 rounded-full inline-flex items-center justify-center hover:bg-yellow-500 transition-colors text-center flex-shrink-0">
                 Lihat Semua
             </a>
         </div>

@@ -72,19 +72,11 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
-                <a href="#" class="text-white/80 text-sm mt-2 block text-right pr-2">Forgot your password?</a>
             </div>
         </div>
 
         <!-- ... (Sisa kode HTML sama: Button, Social, SignUp Link) ... -->
-        <button id="login-button" type="submit" disabled class="w-full py-4 mt-5 rounded-full text-lg font-semibold transition-all duration-300 bg-gray-400 text-gray-600 cursor-not-allowed">Login</button>
-        <div class="flex items-center justify-center my-6 relative z-10">
-            <div class="flex-grow h-0.5 bg-white/30"></div><span class="px-4 text-white/80 font-medium">Or</span><div class="flex-grow h-0.5 bg-white/30"></div>
-        </div>
-        <div class="space-y-4">
-            <a href="#" class="flex items-center justify-center w-full bg-white py-3.5 rounded-full text-black font-semibold text-center"><img src="{{ asset('images/logo-google.png') }}" alt="Google" class="w-6 h-6 mr-3">Login with Google</a>
-            <a href="#" class="flex items-center justify-center w-full bg-white py-3.5 rounded-full text-black font-semibold text-center"><img src="{{ asset('images/logo-facebook.png') }}" alt="Facebook" class="w-6 h-6 mr-3">Login with Facebook</a>
-        </div>
+        <button id="login-button" type="submit" class="w-full py-4 mt-6 rounded-full text-lg font-semibold transition-all duration-300 bg-yellow-400 text-blue-600 hover:bg-yellow-300 active:scale-[0.98] shadow-lg">Login</button>
         <div class="flex-grow"></div>
         <p class="text-white/80 text-center text-base mt-8 mb-4">Don't have an account? <a href="{{ route('register.form') }}" class="font-bold text-white underline">SignUp</a></p>
 
@@ -133,20 +125,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
+    // Visual validation feedback only — the submit button stays enabled; the server validates.
     function checkFormValidity() {
-        const isEmailValid = validateField(emailInput);
-        updateFieldStyle(emailInput, isEmailValid);
+        updateFieldStyle(emailInput, validateField(emailInput));
         updateFieldStyle(passwordInput, false); // Manual trigger untuk visual password
-
-        if (isEmailValid && passwordInput.value.length > 0) {
-            loginButton.disabled = false;
-            loginButton.classList.remove('bg-gray-400', 'text-gray-600', 'cursor-not-allowed');
-            loginButton.classList.add('bg-yellow-400', 'text-blue-600');
-        } else {
-            loginButton.disabled = true;
-            loginButton.classList.add('bg-gray-400', 'text-gray-600', 'cursor-not-allowed');
-            loginButton.classList.remove('bg-yellow-400', 'text-blue-600');
-        }
     }
     [emailInput, passwordInput].forEach(input => { input.addEventListener('input', checkFormValidity); });
     checkFormValidity();

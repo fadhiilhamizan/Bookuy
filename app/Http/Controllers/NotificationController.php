@@ -77,14 +77,13 @@ class NotificationController extends Controller
 
         // Loop setiap user dan buatkan notifikasi
         foreach ($users as $user) {
-            Notification::create([
-                'user_id' => $user->id,
-                'title' => $request->title,
-                'message' => $request->message,
-                'type' => $request->type, // system, promo, info
-                'icon' => $request->icon,
-                'is_read' => false,
-            ]);
+            app(\App\Services\NotificationService::class)->send(
+                $user->id,
+                $request->title,
+                $request->message,
+                $request->type,
+                $request->icon
+            );
         }
 
         return redirect()->route('notification.index')->with('success', 'Notifikasi global berhasil dikirim ke ' . $users->count() . ' pengguna!');

@@ -36,7 +36,7 @@ class AuthController extends Controller
         $request->validate([
             'fullname' => 'required|string|min:4',
             'email'    => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         // 2. Buat User Baru
@@ -48,13 +48,13 @@ class AuthController extends Controller
                 'password' => Hash::make($request->password),
             ]);
 
-            Notification::create([
-                'user_id' => $user->id,
-                'title'   => 'Welcome Aboard!',
-                'message' => 'Akun Anda berhasil dibuat. Selamat menjelajahi Bookuy!',
-                'type'    => 'system',
-                'icon'    => 'icon-notif-profile.png'
-            ]);
+            app(\App\Services\NotificationService::class)->send(
+                $user->id,
+                'Welcome Aboard!',
+                'Akun Anda berhasil dibuat. Selamat menjelajahi Bookuy!',
+                'system',
+                'icon-notif-profile.png'
+            );
 
             // 3. Login User secara otomatis setelah registrasi
             Auth::login($user);

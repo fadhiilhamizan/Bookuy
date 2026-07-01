@@ -139,11 +139,16 @@ body[data-view-mode='desktop'] .app-screen {
    Per-view multi-column density is layered on in the UI-polish phase. */
 body[data-view-mode='desktop'] .app-content {
     width: 100%;
-    max-width: 1024px;
+    max-width: 760px; /* focused reading column for content, forms and lists */
     margin: 0 auto;
     min-height: 100vh;
     background: #ffffff;
     box-shadow: 0 0 60px rgba(15, 23, 42, 0.06);
+}
+
+/* Showcase pages (browse grids, product hero) get the full-width canvas. */
+body[data-view-mode='desktop'].page-wide .app-content {
+    max-width: 1120px;
 }
 
 body[data-view-mode='desktop'] .iphone-notch {

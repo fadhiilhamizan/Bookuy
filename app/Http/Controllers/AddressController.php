@@ -61,13 +61,13 @@ class AddressController extends Controller
             'is_default' => $isDefault,
         ]);
 
-        Notification::create([
-            'user_id' => $user->id,
-            'title'   => 'New Address Added!',
-            'message' => "Alamat '{$request->nickname}' berhasil ditambahkan ke daftar alamatmu.",
-            'type'    => 'account',
-            'icon'    => 'icon-notif-location-pin.png'
-        ]);
+        app(\App\Services\NotificationService::class)->send(
+            $user->id,
+            'New Address Added!',
+            "Alamat '{$request->nickname}' berhasil ditambahkan ke daftar alamatmu.",
+            'account',
+            'icon-notif-location-pin.png'
+        );
 
         // Kita akan handle redirect via JS di view untuk menampilkan modal sukses dulu
         return response()->json(['success' => true]);

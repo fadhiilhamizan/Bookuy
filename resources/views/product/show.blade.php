@@ -6,6 +6,8 @@
 // NRP   : 5026231128
 // Kelas : PPPL B
 -->
+@section('body-class', 'page-wide')
+
 @section('content')
 <div class="w-full h-full bg-white flex flex-col relative">
 

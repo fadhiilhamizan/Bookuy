@@ -57,13 +57,13 @@ class ProfileController extends Controller
 
         $user->save();
 
-        Notification::create([
-            'user_id' => $user->id,
-            'title'   => 'Profile Updated!',
-            'message' => 'Informasi profil Anda berhasil disimpan.',
-            'type'    => 'account',
-            'icon'    => 'icon-edit-pencil.png'
-        ]);
+        app(\App\Services\NotificationService::class)->send(
+            $user->id,
+            'Profile Updated!',
+            'Informasi profil Anda berhasil disimpan.',
+            'account',
+            'icon-edit-pencil.png'
+        );
 
         return redirect()->route('profile.index')->with('success', 'Profil berhasil diperbarui!');
     }

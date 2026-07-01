@@ -67,13 +67,13 @@ class CourierController extends Controller
         $order->save();
 
         if ($newStatus === 'Delivered') {
-            Notification::create([
-                'user_id' => $order->buyer_id, // Kirim ke pembeli
-                'title'   => 'Order Delivered!',
-                'message' => 'Pesananmu telah sampai di tujuan.',
-                'type'    => 'transaction',
-                'icon'    => 'icon-notif-truck.png'
-            ]);
+            app(\App\Services\NotificationService::class)->send(
+                $order->buyer_id,
+                'Order Delivered!',
+                'Pesananmu telah sampai di tujuan.',
+                'transaction',
+                'icon-notif-truck.png'
+            );
         }
 
         return back()->with('success', 'Status berhasil diperbarui!');

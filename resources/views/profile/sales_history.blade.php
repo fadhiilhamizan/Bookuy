@@ -52,13 +52,8 @@
                 <!-- Item Card -->
                 <div class="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm relative">
 
-                    <!-- Status Badge (Pojok Kanan Atas) -->
-                    <div class="absolute top-4 right-4 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide
-                        @if($item->order->status == 'Delivered') bg-green-100 text-green-600
-                        @elseif($item->order->status == 'In Transit') bg-yellow-100 text-yellow-700
-                        @else bg-gray-100 text-gray-600 @endif">
-                        {{ $item->order->status == 'Delivered' ? 'Completed' : $item->order->status }}
-                    </div>
+                    <!-- Status Badge -->
+                    <x-status-badge :status="$item->order->status" class="absolute top-4 right-4" />
 
                     <div class="flex gap-4">
                         <!-- Foto Buku -->
